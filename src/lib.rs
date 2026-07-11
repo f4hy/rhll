@@ -62,7 +62,7 @@ impl HyperLogLogCore {
         // rank straight away; the zero-padded low bits only matter if the
         // whole remainder is zero, handled below.
         let remaining = hash << self.p;
-        let max_rank = (64 - self.p + 1) as u8;
+        let max_rank = 64 - self.p + 1;
         let rank = if remaining == 0 {
             max_rank
         } else {
@@ -76,11 +76,7 @@ impl HyperLogLogCore {
 
     pub fn count(&self) -> f64 {
         let m = self.m as f64;
-        let sum: f64 = self
-            .registers
-            .iter()
-            .map(|&r| 2f64.powi(-(r as i32)))
-            .sum();
+        let sum: f64 = self.registers.iter().map(|&r| 2f64.powi(-(r as i32))).sum();
         let raw = alpha(self.m) * m * m / sum;
 
         // Small-range correction: linear counting.
@@ -179,7 +175,9 @@ impl PyHyperLogLog {
 
     /// In-place union with another sketch of the same `p`.
     fn merge(&mut self, other: &PyHyperLogLog) -> PyResult<()> {
-        self.inner.merge(&other.inner).map_err(PyValueError::new_err)
+        self.inner
+            .merge(&other.inner)
+            .map_err(PyValueError::new_err)
     }
 
     fn copy(&self) -> Self {

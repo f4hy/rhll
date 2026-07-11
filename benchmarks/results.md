@@ -19,33 +19,36 @@ trials / variance reported yet).
 
 | n | rhll | datasketch | HLL |
 |---|---|---|---|
-| 10,000 | 0.001s | 0.012s | 0.001s |
-| 100,000 | 0.006s | 0.121s | 0.010s |
-| 1,000,000 | 0.069s | 1.300s | 0.082s |
+| 10,000 | 0.001s | 0.014s | 0.001s |
+| 100,000 | 0.005s | 0.123s | 0.009s |
+| 1,000,000 | 0.057s | 1.288s | 0.086s |
+| 10,000,000 | 0.555s | 12.399s | 0.891s |
 
-`rhll` is ~19x faster than `datasketch` at 1M inserts, and modestly faster
+`rhll` is ~22x faster than `datasketch` at 10M inserts, and modestly faster
 than the `HLL` C extension. Likely the `xxh3_64` hash vs. `datasketch`'s
 SHA1, plus avoiding the Python-level overhead per `.update()` call that
 `datasketch` pays (NumPy array indexing, etc). Per-call PyO3/CPython
-overhead dominates at this item count, which is also why the debug and
-release builds perform almost identically here: the hot loop is call
-overhead, not the Rust-side arithmetic.
+overhead dominates at these item counts, which is also why the debug and
+release builds perform almost identically: the hot loop is call overhead,
+not the Rust-side arithmetic. The gap over `datasketch` widens slightly at
+larger n (~19x at 1M, ~22x at 10M) as SHA1's per-call cost adds up.
 
 ## Count accuracy + speed
 
-`python benchmarks/bench_count.py`, 100,000 distinct items, each inserted
-3x (300,000 total updates), `p=14`:
+`python benchmarks/bench_count.py`, 10,000,000 distinct items, each
+inserted 3x (30,000,000 total updates), `p=14`:
 
 | library | estimate | true | error % | insert time | count time |
 |---|---|---|---|---|---|
-| rhll | 99,797 | 100,000 | 0.20% | 0.027s | 0.00020s |
-| datasketch | 99,682 | 100,000 | 0.32% | 0.406s | 0.00022s |
-| HLL | 100,108 | 100,000 | 0.11% | 0.033s | 0.00001s |
+| rhll | 10,064,440 | 10,000,000 | 0.64% | 2.435s | 0.00021s |
+| datasketch | 10,056,563 | 10,000,000 | 0.57% | 39.471s | 0.00027s |
+| HLL | 10,077,127 | 10,000,000 | 0.77% | 3.389s | 0.00001s |
 
-All three land well within the expected ~1-2% error bound for `p=14`
-(theoretical relative error ≈ `1.04/sqrt(m)` ≈ 0.4% for m=16384) and are
-close to each other, as expected: same algorithm, different hash functions
-and correction-constant implementations.
+All three land within the expected ~1-2% error bound for `p=14`
+(theoretical relative error ≈ `1.04/sqrt(m)` ≈ 0.4% for m=16384, single-run
+variance pushes the observed error a bit above that) and are close to each
+other, as expected: same algorithm, different hash functions and
+correction-constant implementations.
 
 ## Reproducing
 
