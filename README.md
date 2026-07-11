@@ -3,6 +3,15 @@
 A Rust-powered [HyperLogLog](https://en.wikipedia.org/wiki/HyperLogLog)
 cardinality estimator for Python, exposed via [PyO3](https://pyo3.rs).
 
+## Install
+
+```sh
+pip install rhll
+```
+
+Prebuilt wheels (Linux/macOS/Windows, Python 3.11+) via `abi3`, no Rust
+toolchain needed at install time.
+
 ## Benchmarks
 
 Up to 10M inserts, single-threaded, release build, `rhll` vs. `datasketch`

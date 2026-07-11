@@ -94,7 +94,13 @@ for this repo: project settings → Publishing → add GitHub Actions
 publisher, pointing at owner `f4hy`, repo `rhll`, workflow `release.yml`,
 and environment `pypi` (or `testpypi`). That's a one-time manual step on
 pypi.org / test.pypi.org, not something this repo's config can do for you.
+`pypi` is configured (v0.1.0 published successfully); `testpypi` is not
+yet set up, so `workflow_dispatch` dry runs currently fail at the token
+exchange with `invalid-publisher` — harmless (fails before any upload)
+but means the dry-run path isn't actually verifying anything until
+someone adds that trusted publisher on test.pypi.org too.
 
 Before tagging a real release: bump `version` in both `Cargo.toml` and
-`pyproject.toml`, and confirm a TestPyPI dry run (`workflow_dispatch`)
-installs and imports cleanly first.
+`pyproject.toml` (they moved together for v0.1.0: both were `0.1.0`), and
+ideally confirm a TestPyPI dry run installs and imports cleanly first
+(see the gap noted above).
