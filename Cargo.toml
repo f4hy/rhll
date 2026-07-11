@@ -1,0 +1,23 @@
+[package]
+name = "rhll"
+version = "0.1.0"
+edition = "2021"
+description = "Rust-powered HyperLogLog for Python (PyO3)"
+license = "MIT"
+repository = "https://github.com/f4hy/rhll"
+
+[lib]
+name = "_rhll"
+crate-type = ["cdylib", "rlib"]
+
+# `extension-module` links against libpython and breaks `cargo test` (no
+# libpython to link against outside a Python process). Gate it behind a
+# feature that's on by default (so `maturin develop`/`maturin build` just
+# work) but can be turned off for plain `cargo test --no-default-features`.
+[features]
+default = ["extension-module"]
+extension-module = ["pyo3/extension-module"]
+
+[dependencies]
+pyo3 = "0.29"
+xxhash-rust = { version = "0.8", features = ["xxh3"] }

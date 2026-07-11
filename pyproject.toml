@@ -1,0 +1,27 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "rhll"
+version = "0.1.0"
+description = "Rust-powered HyperLogLog for Python"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-benchmark",
+    "datasketch",
+    "HLL",
+]
+
+[tool.maturin]
+module-name = "rhll._rhll"
+python-source = "python"
