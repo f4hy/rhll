@@ -25,7 +25,9 @@ rhll/
 │       └── __init__.pyi      # type stubs for the compiled extension
 ├── tests/                    # pytest suite
 ├── benchmarks/                # rhll vs datasketch vs HLL
-├── .github/workflows/ci.yml  # rust fmt/clippy/test, python test matrix, ruff
+├── .github/workflows/
+│   ├── ci.yml                 # rust fmt/clippy/test, python test matrix, ruff
+│   └── release.yml            # build wheels (linux/macos/windows + sdist), publish
 └── README.md
 ```
 
@@ -68,3 +70,31 @@ context unless you pass `--no-default-features`.
 - After changing `src/lib.rs`, rebuild with `maturin develop --release`
   before running `pytest`. An editable install does not pick up Rust
   changes automatically.
+- `pyo3` is built with `abi3-py311` (`Cargo.toml`), matching
+  `requires-python` in `pyproject.toml`. One wheel per platform covers
+  every supported Python version; don't drop `abi3-pyXXX` without also
+  widening the release matrix in `release.yml` to build per-version
+  wheels again.
+- Keep the `version` field in `Cargo.toml` and `pyproject.toml` in sync.
+  They aren't derived from each other.
+
+## Releasing
+
+`release.yml` builds wheels for Linux (x86_64/aarch64, manylinux),
+Windows (x64), macOS (x86_64/aarch64), plus an sdist.
+
+- `workflow_dispatch` (manual run from the Actions tab) publishes the
+  build to TestPyPI as a dry run.
+- Pushing a tag matching `v*` (e.g. `v0.1.0`) publishes to real PyPI.
+
+Both publish jobs use PyPI Trusted Publishing (OIDC) via
+`pypa/gh-action-pypi-publish`, not a stored API token. Before either can
+succeed, a trusted publisher must be configured on the PyPI/TestPyPI side
+for this repo: project settings → Publishing → add GitHub Actions
+publisher, pointing at owner `f4hy`, repo `rhll`, workflow `release.yml`,
+and environment `pypi` (or `testpypi`). That's a one-time manual step on
+pypi.org / test.pypi.org, not something this repo's config can do for you.
+
+Before tagging a real release: bump `version` in both `Cargo.toml` and
+`pyproject.toml`, and confirm a TestPyPI dry run (`workflow_dispatch`)
+installs and imports cleanly first.
