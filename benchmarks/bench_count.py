@@ -22,7 +22,7 @@ try:
 except ImportError:
     CHLL = None
 
-TRUE_CARDINALITY = 100_000
+TRUE_CARDINALITY = 10_000_000
 DUPLICATE_FACTOR = 3  # each distinct item inserted this many times
 P = 14
 

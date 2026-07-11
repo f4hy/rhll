@@ -25,6 +25,7 @@ rhll/
 │       └── __init__.pyi      # type stubs for the compiled extension
 ├── tests/                    # pytest suite
 ├── benchmarks/                # rhll vs datasketch vs HLL
+├── .github/workflows/ci.yml  # rust fmt/clippy/test, python test matrix, ruff
 └── README.md
 ```
 
@@ -39,6 +40,12 @@ python -m venv .venv && source .venv/bin/activate
 pip install -e '.[dev]'
 maturin develop --release
 pytest
+
+# Lint (same checks CI runs):
+cargo fmt --check
+cargo clippy --no-default-features -- -D warnings
+ruff check .
+ruff format --check .
 
 # Benchmarks (rhll vs datasketch vs HLL):
 python benchmarks/bench_insert.py

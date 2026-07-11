@@ -5,20 +5,21 @@ cardinality estimator for Python, exposed via [PyO3](https://pyo3.rs).
 
 ## Benchmarks
 
-1M inserts, single-threaded, release build, `rhll` vs. `datasketch` vs. the
-`HLL` C extension. Full methodology, machine details, and count-accuracy
-numbers: [`benchmarks/results.md`](./benchmarks/results.md).
+Up to 10M inserts, single-threaded, release build, `rhll` vs. `datasketch`
+vs. the `HLL` C extension. Full methodology, machine details, and
+count-accuracy numbers: [`benchmarks/results.md`](./benchmarks/results.md).
 
 | n | rhll | datasketch | HLL |
 |---|---|---|---|
-| 10,000 | 0.001s | 0.012s | 0.001s |
-| 100,000 | 0.006s | 0.121s | 0.010s |
-| 1,000,000 | 0.069s | 1.300s | 0.082s |
+| 10,000 | 0.001s | 0.014s | 0.001s |
+| 100,000 | 0.005s | 0.123s | 0.009s |
+| 1,000,000 | 0.057s | 1.288s | 0.086s |
+| 10,000,000 | 0.555s | 12.399s | 0.891s |
 
-`rhll` is ~19x faster than `datasketch` at 1M inserts, and slightly faster
+`rhll` is ~22x faster than `datasketch` at 10M inserts, and slightly faster
 than the `HLL` C extension. `count()` accuracy is in the same ballpark as
-both (0.20% error, vs. 0.11% for `HLL` and 0.32% for `datasketch`, on a
-100K-item dataset at `p=14`).
+both (0.64% error, vs. 0.77% for `HLL` and 0.57% for `datasketch`, on a
+10M-item dataset at `p=14`).
 
 ## Usage
 
@@ -42,7 +43,7 @@ data = h.to_bytes()
 restored = HyperLogLog.from_bytes(data)
 ```
 
-> [!INFO]
+> [!NOTE]
 > **Compatibility with `datasketch.HyperLogLog`**
 >
 > `update(bytes)`, `count() -> float`, `merge(other)`, and `copy()` line up
