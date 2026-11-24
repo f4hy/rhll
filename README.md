@@ -1,5 +1,7 @@
 # rhll
 
+[![PyPI](https://img.shields.io/pypi/v/rhll)](https://pypi.org/project/rhll/)
+
 A Rust-powered [HyperLogLog](https://en.wikipedia.org/wiki/HyperLogLog)
 cardinality estimator for Python, exposed via [PyO3](https://pyo3.rs).
 
